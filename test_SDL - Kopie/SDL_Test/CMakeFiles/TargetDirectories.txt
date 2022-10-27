@@ -1,5 +1,0 @@
-/home/immaculee/projet_c++/sdl_project/test_SDL - Kopie/SDL_Test/CMakeFiles/rebuild_cache.dir
-/home/immaculee/projet_c++/sdl_project/test_SDL - Kopie/SDL_Test/CMakeFiles/edit_cache.dir
-/home/immaculee/projet_c++/sdl_project/test_SDL - Kopie/SDL_Test/SDL_Test/CMakeFiles/edit_cache.dir
-/home/immaculee/projet_c++/sdl_project/test_SDL - Kopie/SDL_Test/SDL_Test/CMakeFiles/rebuild_cache.dir
-/home/immaculee/projet_c++/sdl_project/test_SDL - Kopie/SDL_Test/SDL_Test/CMakeFiles/SDLTest.dir
