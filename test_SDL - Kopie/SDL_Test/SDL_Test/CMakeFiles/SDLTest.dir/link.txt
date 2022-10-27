@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/SDLTest.dir/Main.cpp.o  -o SDLTest  -lSDL2 -lSDL2_image 
