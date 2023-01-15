@@ -46,7 +46,7 @@ namespace
         }
 
         SDL_Surface *ret =
-            SDL_ConvertSurface(img, window_surface_ptr->format, 0);
+                SDL_ConvertSurface(img, window_surface_ptr->format, 0);
         if (ret == NULL)
         {
             std::cout << "BUG CONVERT SURFACE" << std::endl;
@@ -84,7 +84,7 @@ bool Vector2D::is_nan()
     return this->x != this->x || this->y != this->y;
 }
 
-void Vector2D::operator+=(const Vector2 &a)
+void Vector2D::operator+=(const Vector2D &a)
 {
     this->x += a.x;
     this->y += a.y;
@@ -95,9 +95,9 @@ Vector2D operator-(const Vector2D &a, const Vector2D &o)
     return Vector2D(a.x - o.x, a.y - o.y);
 }
 
-Vector2 operator*(const Vector2 &a, float b)
+Vector2D operator*(const Vector2D &a, float b)
 {
-    return Vector2(b * a.x, b * a.y);
+    return Vector2D(b * a.x, b * a.y);
 }
 
 std::ostream &operator<<(std::ostream &o, const Vector2D &a)
@@ -171,16 +171,89 @@ std::string interacting_object::get_attribute()
  * ANIMAL
  */
 
+animal::animal(const std::string &file_path, SDL_Surface *window_surface_ptr)
+        : interacting_object::interacting_object(window_surface_ptr, file_path)
+{
+    this->hp = 600;
+    this->speed = random_vector(this->speed_norm);
+}
+
+void animal::draw()
+{
+    SDL_Rect dst_rect = SDL_Rect{ int(this->pos.x), int(this->pos.y),
+                                  int(this->pos.x + this->image_ptr_->w),
+                                  int(this->pos.y + this->image_ptr_->h) };
+
+    SDL_BlitSurface(this->image_ptr_, NULL, this->window_surface_ptr_,
+                    &dst_rect);
+}
 
 
-/* 
- * SHEPHERD 
+/*
+ * SHEPHERD
  */
 
 /*
  * WOLF
  */
 
+wolf::wolf(SDL_Surface *window_surface_ptr)
+        : animal::animal("media/wolf.png", window_surface_ptr)
+{
+    this->attribute = "wolf";
+}
+
+void wolf::interract(animal &other)
+{
+    if (other.has_attribute("sheep") == true)
+    {
+        float curr_distance = vector_distance(this->pos, other.pos);
+        if (curr_distance < this->closest_dist)
+        {
+            this->closest_sheep = other.pos;
+            this->closest_dist = curr_distance;
+        }
+    }
+    else if (other.has_attribute("dog") == true)
+    {
+        Vector2D vector_to_dog = other.pos - this->pos;
+        this->dog_position = other.pos;
+        float distance_to_dog = vector_to_dog.get_norm();
+        if (distance_to_dog < 250)
+        {
+            this->is_afraid = true;
+        }
+        else
+        {
+            this->is_afraid = false;
+        }
+    }
+}
+void wolf::move()
+{
+    if (this->hp != 0)
+        this->hp--;
+
+    this->speed = normalize(this->closest_sheep - this->pos) * this->speed_norm;
+    this->closest_dist = FLT_MAX;
+
+    if (this->is_afraid == true)
+    {
+        this->speed =
+                normalize(this->pos - this->dog_position) * this->speed_norm;
+    }
+
+    if (this->pos.x + this->speed.x < frame_boundary
+        || this->pos.x + this->speed.x
+           > frame_width - this->image_ptr_->w - frame_boundary)
+        this->speed.x = -this->speed.x;
+    if (this->pos.y + this->speed.y < frame_boundary
+        || this->pos.y + this->speed.y
+           > frame_height - this->image_ptr_->h - frame_boundary)
+        this->speed.y = -this->speed.y;
+    this->pos.x += this->speed.x;
+    this->pos.y += this->speed.y;
+}
 
 /*
  * DOG
