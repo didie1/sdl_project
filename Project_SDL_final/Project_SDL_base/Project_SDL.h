@@ -50,7 +50,7 @@ public:
 
     ~interacting_object();
     Vector2D pos;
-    Vector2D spd;
+    Vector2D speed;
     bool has_attribute(const std::string &att);
     std::string get_attribute();
     virtual void interract(animal &other){};
