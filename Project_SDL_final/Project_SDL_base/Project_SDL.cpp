@@ -188,18 +188,54 @@ void animal::draw()
                     &dst_rect);
 }
 
-/* 
+/*
  * SHEPHERD
  */
 
-class shepherd : public animal
+shepherd::shepherd(SDL_Surface *window_surface_ptr)
+    : animal::animal("media/shepherd.png", window_surface_ptr)
 {
-public:
-    shepherd(SDL_Surface *window_surface_ptr);
-    void move() final;
-    void interract(animal &other) final;
-};
+    this->attribute = "shepherd";
+}
 
+void shepherd::interract(animal &other)
+{
+    return;
+}
+
+void shepherd::move()
+{
+    SDL_Event event;
+    const Uint8 *keyboard_state_array = SDL_GetKeyboardState(NULL);
+    SDL_PollEvent(&event);
+    //WSAD  & UP/DOWN/LEFT/RIGHT arrow
+    if (keyboard_state_array[SDL_SCANCODE_W]
+        || keyboard_state_array[SDL_SCANCODE_UP])
+        this->speed.y -= 5;
+    if (keyboard_state_array[SDL_SCANCODE_S]
+        || keyboard_state_array[SDL_SCANCODE_DOWN])
+        this->speed.y += 5;
+    if (keyboard_state_array[SDL_SCANCODE_A]
+        || keyboard_state_array[SDL_SCANCODE_LEFT])
+        this->speed.x -= 5;
+    if (keyboard_state_array[SDL_SCANCODE_D]
+        || keyboard_state_array[SDL_SCANCODE_RIGHT])
+        this->speed.x += 5;
+    //Limitation inside the frame 
+    if (this->pos.x + this->speed.x < frame_boundary
+        || this->pos.x + this->speed.x
+            > frame_width - this->image_ptr_->w - frame_boundary)
+        this->speed.x = -this->speed.x;
+    if (this->pos.y + this->speed.y < frame_boundary
+        || this->pos.y + this->speed.y
+            > frame_height - this->image_ptr_->h - frame_boundary)
+        this->speed.y = -this->speed.y;
+
+    this->pos.x += this->speed.x;
+    this->pos.y += this->speed.y;
+    this->speed.y = 0;
+    this->speed.x = 0;
+}
 /*
  * WOLF
  */
