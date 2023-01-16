@@ -188,10 +188,17 @@ void animal::draw()
                     &dst_rect);
 }
 
-
-/*
+/* 
  * SHEPHERD
  */
+
+class shepherd : public animal
+{
+public:
+    shepherd(SDL_Surface *window_surface_ptr);
+    void move() final;
+    void interract(animal &other) final;
+};
 
 /*
  * WOLF
@@ -259,14 +266,57 @@ void wolf::move()
  * DOG
  */
 
+dog::dog(SDL_Surface *window_surface_ptr)
+    : animal::animal("media/dog.png", window_surface_ptr)
+{
+    this->attribute = "dog";
+}
+
+void dog::interract(animal &other)
+{
+    if (other.has_attribute("shepherd") == false)
+        return;
+    this->speed = Vector2D(0, 0);
+    this->pos =
+        Vector2D(other.pos.x + this->circle * cos(this->phi / 50),
+                other.pos.y + this->circle * sin(this->phi / 50));
+}
+
+void dog::move()
+{
+    if (this->pos.x < frame_boundary)
+        this->pos.x = frame_boundary;
+    else if (this->pos.x > frame_width - this->image_ptr_->w - frame_boundary)
+        this->pos.x = frame_width - this->image_ptr_->w - frame_boundary;
+    if (this->pos.y < frame_boundary)
+        this->pos.y = frame_boundary;
+    else if (this->pos.y > frame_height - this->image_ptr_->h - frame_boundary)
+        this->pos.y = frame_height - this->image_ptr_->h - frame_boundary;
+
+    this->phi++;
+}
 /*
  * SHEEP
- */
-
-
+*/
 /*
  * GROUND
  */
+
+class ground
+{
+private:
+    SDL_Surface *window_surface_ptr_;
+    double score = 0.0;
+    double frame = 0.0;
+
+public:
+    std::vector<std::unique_ptr<animal>> animals;
+    shepherd *player;
+    dog *doggo;
+    ground(SDL_Surface *window_surface_ptr);
+    ~ground();
+    bool update();
+};
 
 /*
  * APPLICATION
