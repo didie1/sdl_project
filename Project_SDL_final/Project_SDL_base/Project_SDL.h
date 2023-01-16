@@ -119,6 +119,22 @@ public:
     void interract(animal &other) final;
 };
 
+
+/*
+ * DOG
+ */
+class dog : public animal
+{
+    private:
+        float circle = 200;
+        float phi = 0;
+
+    public:
+        dog(SDL_Surface *window_surface_ptr);
+        void move();
+        void interract(animal &other) final;
+};
+
 /*
  * SHEEP
  */
