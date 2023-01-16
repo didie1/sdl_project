@@ -86,6 +86,18 @@ public:
     unsigned int hp;
 };
 
+/* 
+ * SHEPHERD
+ */
+
+class shepherd : public animal
+{
+public:
+    shepherd(SDL_Surface *window_surface_ptr);
+    void move() final;
+    void interract(animal &other) final;
+};
+
 
 /*
  * WOLF
@@ -125,6 +137,22 @@ private:
 /*
  * GROUND
  */
+
+class ground
+{
+private:
+    SDL_Surface *window_surface_ptr_;
+    double score = 0.0;
+    double frame = 0.0;
+
+public:
+    std::vector<std::unique_ptr<animal>> animals;
+    shepherd *player;
+    dog *doggo;
+    ground(SDL_Surface *window_surface_ptr); 
+    ~ground(); 
+    bool update(); 
+};
 
 
 /*
