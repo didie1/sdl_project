@@ -334,25 +334,160 @@ void dog::move()
 /*
  * SHEEP
 */
+
+sheep::sheep(SDL_Surface *window_surface_ptr)
+    : animal::animal("media/sheep.png", window_surface_ptr)
+{
+    if (get_rand_float(0, 1) > 0)
+        male = false;
+    else
+    {
+        cooldown = 0;
+    }
+    this->attribute = "sheep";
+}
+
+void sheep::interract(animal &other)
+{
+    if (other.has_attribute("wolf"))
+    {
+        float temp = vector_distance(this->pos, other.pos);
+        if (temp < 80)
+        {
+            this->hp = 0;
+            other.hp = 600;
+        }
+        else if (temp < this->dist_wolf)
+        {
+            this->dist_wolf = temp;
+            this->closest_wolf = other.pos;
+        }
+    }
+    if (other.has_attribute("sheep"))
+    {
+        if (other.male && !this->male
+            && vector_distance(this->pos, other.pos) < 80
+            && this->cooldown == 0)
+            this->hp = 60;
+    }
+}
+
+void sheep::move()
+{
+    if (this->dist_wolf < 150)
+    {
+        this->speed =
+            normalize(this->pos - this->closest_wolf) * this->speed_norm * 1.5;
+    }
+    else
+    {
+        this->speed = normalize(this->speed) * this->speed_norm;
+    }
+
+    if (this->cooldown != 0)
+    {
+        this->cooldown--;
+    }
+
+    if (this->pos.x + this->speed.x < frame_boundary
+        || this->pos.x + this->speed.x
+            > frame_width - this->image_ptr_->w - frame_boundary)
+        this->speed.x = -this->speed.x;
+    if (this->pos.y + this->speed.y < frame_boundary
+        || this->pos.y + this->speed.y
+            > frame_height - this->image_ptr_->h - frame_boundary)
+        this->speed.y = -this->speed.y;
+    this->pos.x += this->speed.x;
+    this->pos.y += this->speed.y;
+
+    this->dist_wolf = FLT_MAX;
+}
+
+
 /*
  * GROUND
  */
 
-class ground
+ground::ground(SDL_Surface *window_surface_ptr)
 {
-private:
-    SDL_Surface *window_surface_ptr_;
-    double score = 0.0;
-    double frame = 0.0;
+    this->window_surface_ptr_ = window_surface_ptr;
+}
 
-public:
-    std::vector<std::unique_ptr<animal>> animals;
-    shepherd *player;
-    dog *doggo;
-    ground(SDL_Surface *window_surface_ptr);
-    ~ground();
-    bool update();
-};
+ground::~ground()
+{
+    std::cout << "Your final score is " << this->score << std::endl;
+    SDL_FreeSurface(this->window_surface_ptr_);
+    delete (this->player);
+}
+
+bool ground::update()
+{
+    std::vector<std::vector<std::unique_ptr<animal>>::iterator> dead;
+    std::vector<Vector2D> babies;
+    std::vector<std::unique_ptr<animal>> babie;
+    for (auto i = this->animals.begin(); i != this->animals.end(); i++)
+    {
+        for (auto j = this->animals.begin(); j != this->animals.end(); j++)
+        {
+            if (i == j)
+                continue;
+            i->get()->interract(*(j->get()));
+        }
+        if (i->get()->has_attribute("sheep") && i->get()->hp == 60)
+        {
+            sheep *add = (sheep *)(i->get());
+            babies.push_back(i->get()->pos);
+
+            add->cooldown = 600;
+            add->hp = 70;
+        }
+        if (i->get()->hp == 0)
+            dead.push_back(i);
+        if (i->get()->pos.is_nan())
+        {
+            std::cout << i->get()->get_attribute() << std::endl;
+        }
+        i->get()->move();
+        i->get()->draw();
+    }
+    for (auto &i : dead)
+    {
+        this->animals.erase(i);
+    }
+
+    for (auto &i : babies)
+    {
+        sheep *new_sheep = new sheep(this->window_surface_ptr_);
+        new_sheep->pos = i;
+        new_sheep->cooldown = 3600;
+        this->animals.push_back(std::unique_ptr<animal>(new_sheep));
+    }
+    babies.clear();
+    dead.clear();
+    int sheep = 0;
+    int wolf = 0;
+    for (auto i = this->animals.begin(); i != this->animals.end(); i++)
+    {
+        if (i->get()->has_attribute("sheep"))
+            sheep++;
+        else if (i->get()->has_attribute("wolf"))
+        {
+            wolf++;
+        }
+    }
+    if (sheep == 0 || wolf == 0)
+        return true;
+    if (this->frame == 60)
+    {
+        this->score = this->score + double(sheep);
+        this->score = this->score / 2.0;
+        this->frame = 0;
+    }
+    else
+        this->frame++;
+    return false;
+}
+
 
 /*
  * APPLICATION
