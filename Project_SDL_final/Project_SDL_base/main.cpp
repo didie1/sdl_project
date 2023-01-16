@@ -20,11 +20,8 @@ int main(int argc, char* argv[]) {
 
   application my_app = application(std::stoul(argv[1]), std::stoul(argv[2]));
 
-  // std::cout << "Window" << std::endl;
 
   int loop_val = my_app.loop(std::stoul(argv[3]));
-
-   // std::cout << "Exiting" << loop_val << std::endl;
 
   SDL_Quit();
 
