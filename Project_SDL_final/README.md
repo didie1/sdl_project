@@ -1,4 +1,4 @@
-Memebres du groupe
+Membres du groupe
 	BAHOUNDJE Immaculée
 	MUR Valentin
 	RATOVOHERINJANAHARY Elodie
