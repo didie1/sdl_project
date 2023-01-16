@@ -7,7 +7,8 @@
 #include <memory>
 #include <optional>
 #include <vector>
-// Defintions
+
+
 constexpr double frame_rate = 60.0; // refresh rate
 constexpr double frame_time = 1. / frame_rate;
 constexpr unsigned frame_width = 1400; // Width of window in pixel
@@ -38,7 +39,8 @@ public:
 Vector2D normalize(const Vector2D &o);
 float vector_distance(const Vector2D &a, const Vector2D &b);
 
-//class animal;
+class animal;
+
 /*
  * INTERACTING OBJECT
  */
