@@ -167,6 +167,30 @@ std::string interacting_object::get_attribute()
     return this->attribute;
 }
 
+interacting_object::interacting_object(SDL_Surface *window_surface_ptr,
+                                       const std::string &path)
+{
+    char *S = new char[path.length() + 1];
+    for (size_t i = 0; i < path.length(); i++)
+    {
+        S[i] = path[i];
+    }
+    S[path.length()] = 0;
+
+    this->window_surface_ptr_ = window_surface_ptr;
+    this->image_ptr_ = load_surface_for(S, window_surface_ptr);
+
+    this->pos = {
+        get_rand_float(100, window_surface_ptr->w - 100 - this->image_ptr_->w),
+        get_rand_float(100, window_surface_ptr->h - 100 - this->image_ptr_->h)
+    };
+}
+
+interacting_object::~interacting_object()
+{
+    SDL_FreeSurface(this->image_ptr_);
+}
+
 /*
  * ANIMAL
  */
